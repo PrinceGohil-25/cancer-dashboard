@@ -1,0 +1,346 @@
+:root {
+    --bg-dark: #f0f4f8;
+    /* Soft medical gray-blue */
+    --bg-card: #ffffff;
+    /* pure white cards */
+    --text-primary: #1e293b;
+    /* darker text for contrast */
+    --text-secondary: #64748b;
+    --accent: #0d9488;
+    /* Teal medical accent */
+    --accent-hover: #0f766e;
+    --border: #e2e8f0;
+    --success: #059669;
+    --danger: #dc2626;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    /* Prevent horizontal scroll */
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 280px;
+    background-color: var(--bg-card);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-group label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+/* Checkbox List */
+.checkbox-list {
+    max-height: 200px;
+    overflow-y: auto;
+    background: #f8fafc;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.checkbox-item input {
+    accent-color: var(--accent);
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    /* Allow scrolling */
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+}
+
+.btn-primary {
+    background-color: var(--accent);
+    color: var(--bg-dark);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 0.8rem;
+    text-align: left;
+    margin-top: 0.25rem;
+}
+
+/* KPIs */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.kpi-card {
+    background-color: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.kpi-card h3 {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.kpi-card .value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.kpi-card .trend {
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.trend.positive {
+    color: var(--success);
+}
+
+.trend.negative {
+    color: var(--danger);
+}
+
+/* Charts */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto auto;
+    /* Allow rows to size automatically */
+    gap: 1.5rem;
+}
+
+.chart-card {
+    background-color: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow);
+}
+
+/* External Legend */
+.external-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.chart-card.large {
+    grid-column: span 2;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.chart-header h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* Slider */
+.range-slider {
+    position: relative;
+    height: 20px;
+    margin-top: 10px;
+}
+
+.range-slider input {
+    position: absolute;
+    width: 100%;
+    pointer-events: none;
+    appearance: none;
+    background: none;
+}
+
+.range-slider input::-webkit-slider-thumb {
+    pointer-events: auto;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+    margin-top: -6px;
+}
+
+.range-slider input::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+}
+
+.range-values {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+/* Plotly overrides */
+.js-plotly-plot .plotly .modebar {
+    left: 0 !important;
+}
+
+/* Expanded Chart State */
+.chart-card.expanded {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 95vw;
+    height: 90vh;
+    z-index: 1000;
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Backdrop when expanded */
+body.has-expanded-chart::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    backdrop-filter: blur(4px);
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.25rem;
+    transition: color 0.2s;
+    margin-left: 0.5rem;
+}
+
+.btn-icon:hover {
+    color: var(--accent);
+}
+
+/* Ensure chart fills container when expanded */
+.chart-card.expanded>div:last-child {
+    flex: 1;
+    min-height: 0;
+}
