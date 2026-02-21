@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancer Mortality Dashboard | Australia</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Plotly.js (CDN - loads from fast global servers) -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <!-- PapaParse (CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- Embedded Data (Bypasses CORS for local files) -->
+    <script src="data.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" style="
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: #f0f4f8; z-index: 9999;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        font-family: 'Inter', sans-serif; color: #0d9488;
+    ">
+        <div style="
+            width: 50px; height: 50px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #0d9488;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 1.5rem;
+        "></div>
+        <div style="font-size: 1.2rem; font-weight: 600;">Loading Cancer Analytics...</div>
+        <div style="font-size: 0.85rem; color: #64748b; margin-top: 0.5rem;">Initialising visualisations</div>
+        <style>
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Cancer Analytics</span>
+            </div>
+
+            <div class="filter-group">
+                <label>Date Range</label>
+                <div class="range-slider">
+                    <input type="range" id="yearRangeMin" min="2000" max="2023" value="2000">
+                    <input type="range" id="yearRangeMax" min="2000" max="2023" value="2023">
+                </div>
+                <div class="range-values">
+                    <span id="yearMinVal">2000</span> - <span id="yearMaxVal">2023</span>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Cancer Types</label>
+                <input type="text" id="cancerSearch" placeholder="Search types..."
+                    style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-card); color: var(--text-primary);">
+                <div class="checkbox-list" id="cancerTypeFilter">
+                    <!-- Populated by JS -->
+                </div>
+                <button id="selectAllBtn" class="btn-text">Select All</button>
+                <button id="clearAllBtn" class="btn-text">Clear All</button>
+            </div>
+
+            <div class="filter-group">
+                <label>Analysis Mode</label>
+                <select id="metricSelect">
+                    <option value="ASR (World)">Age-Standardised Rate (World)</option>
+                    <option value="Crude rate">Crude Rate</option>
+                    <option value="Cumulative risk">Cumulative Risk</option>
+                </select>
+            </div>
+
+            <div class="sidebar-footer">
+                <p>Data Source: AIHW 2024</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header>
+                <div>
+                    <h1>Cancer Mortality Trends</h1>
+                    <p class="subtitle">Australia (2000 - 2023)</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-primary" onclick="exportDashboard()"><i class="fa-solid fa-download"></i> Export
+                        Report</button>
+                </div>
+            </header>
+
+            <!-- Key Metrics Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <h3>Avg Mortality Rate</h3>
+                    <div class="value" id="kpiAvgRate">--</div>
+                    <div class="trend positive" id="kpiTrend"><i class="fa-solid fa-arrow-trend-down"></i> --% vs 2000
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Highest Risk Type</h3>
+                    <div class="value" id="kpiHighestType">--</div>
+                    <div class="subtext" id="kpiHighestValue">-- per 100k</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Dataset Range</h3>
+                    <div class="value">23 Years</div>
+                    <div class="subtext">2000 - 2023</div>
+                </div>
+            </div>
+
+            <!-- External Legend Container -->
+            <div id="customLegend" class="external-legend"></div>
+
+            <!-- Charts Section -->
+            <div class="charts-grid">
+                <div class="chart-card large">
+                    <div class="chart-header">
+                        <h2>Longitudinal Mortality Rate Analysis (2000-2023)</h2>
+                        <div class="chart-controls">
+                            <label><input type="checkbox" id="showTrendline" checked> Show Projection</label>
+                            <button class="btn-icon expand-btn" onclick="toggleExpand(this)"><i
+                                    class="fa-solid fa-expand"></i></button>
+                        </div>
+                    </div>
+                    <div id="trendChart"></div>
+                    <div class="chart-analysis" id="analysis-trendChart"></div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2>Comparative Mean Mortality Rates by Cancer Site</h2>
+                        <button class="btn-icon expand-btn" onclick="toggleExpand(this)"><i
+                                class="fa-solid fa-expand"></i></button>
+                    </div>
+                    <div id="barChart"></div>
+                    <div class="chart-analysis" id="analysis-barChart"></div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2>Proportional Mortality Distribution by Cancer Site</h2>
+                        <button class="btn-icon expand-btn" onclick="toggleExpand(this)"><i
+                                class="fa-solid fa-expand"></i></button>
+                    </div>
+                    <div id="pieChart"></div>
+                    <div class="chart-analysis" id="analysis-pieChart"></div>
+                </div>
+
+                <div class="chart-card large">
+                    <div class="chart-header">
+                        <h2>Cumulative Mortality Burden Over Time (Stacked Area)</h2>
+                        <button class="btn-icon expand-btn" onclick="toggleExpand(this)"><i
+                                class="fa-solid fa-expand"></i></button>
+                    </div>
+                    <div id="areaChart"></div>
+                    <div class="chart-analysis" id="analysis-areaChart"></div>
+                </div>
+
+                <div class="chart-card large">
+                    <div class="chart-header">
+                        <h2>2023 Mortality Burden Analysis: Total Deaths vs. Mortality Rate</h2>
+                        <button class="btn-icon expand-btn" onclick="toggleExpand(this)"><i
+                                class="fa-solid fa-expand"></i></button>
+                    </div>
+                    <div id="treemapChart"></div>
+                    <div class="chart-analysis" id="analysis-treemapChart"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
